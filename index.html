@@ -21,11 +21,33 @@
         }
 
         #pdf-viewer {
+            position: relative;
             width: 95%;
             height: 95%;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             background: white;
             overflow: auto;
+        }
+
+        .page-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .text-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none; /* Allow interaction with links */
+        }
+
+        .text-layer a {
+            pointer-events: auto; /* Enable link clicking */
+            color: transparent; /* Keep the overlay invisible */
         }
     </style>
 </head>
@@ -33,49 +55,63 @@
     <div id="pdf-viewer"></div>
 
     <script>
-        // URL to the PDF
         const url = 'https://tiagomfmadeira.github.io/assets/CV_Tiago_Madeira.pdf';
 
-        // PDF.js Setup
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+        const pdfViewer = document.getElementById('pdf-viewer');
+
         // Load the PDF
-        const loadingTask = pdfjsLib.getDocument(url);
-        loadingTask.promise.then((pdf) => {
+        pdfjsLib.getDocument(url).promise.then(pdf => {
             console.log('PDF loaded');
 
-            // Loop through all pages and render them
-            const viewer = document.getElementById('pdf-viewer');
             for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                pdf.getPage(pageNum).then((page) => {
-                    console.log('Page ' + pageNum + ' loaded');
-
-                    // Set scale and viewport
+                pdf.getPage(pageNum).then(page => {
                     const scale = 1.5;
-                    const viewport = page.getViewport({ scale: scale });
+                    const viewport = page.getViewport({ scale });
 
-                    // Create canvas and append it to the viewer
+                    // Create a container for the page
+                    const pageContainer = document.createElement('div');
+                    pageContainer.className = 'page-container';
+                    pageContainer.style.width = `${viewport.width}px`;
+                    pageContainer.style.height = `${viewport.height}px`;
+                    pdfViewer.appendChild(pageContainer);
+
+                    // Create the canvas for rendering
                     const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
                     canvas.width = viewport.width;
                     canvas.height = viewport.height;
-                    viewer.appendChild(canvas);
+                    pageContainer.appendChild(canvas);
 
-                    // Render the page into the canvas
+                    const canvasContext = canvas.getContext('2d');
                     const renderContext = {
-                        canvasContext: context,
-                        viewport: viewport,
+                        canvasContext,
+                        viewport,
                     };
+
                     page.render(renderContext).promise.then(() => {
-                        console.log('Page ' + pageNum + ' rendered');
+                        console.log(`Page ${pageNum} rendered`);
+                    });
+
+                    // Create the text layer
+                    page.getTextContent().then(textContent => {
+                        const textLayerDiv = document.createElement('div');
+                        textLayerDiv.className = 'text-layer';
+                        pageContainer.appendChild(textLayerDiv);
+
+                        pdfjsLib.renderTextLayer({
+                            textContent,
+                            container: textLayerDiv,
+                            viewport,
+                            textDivs: [],
+                        });
                     });
                 });
             }
-        }).catch((error) => {
+        }).catch(error => {
             console.error('Error loading PDF:', error);
-            const viewer = document.getElementById('pdf-viewer');
-            viewer.innerHTML = '<p style="color: red; text-align: center;">Failed to load PDF.</p>';
+            pdfViewer.innerHTML = '<p style="color: red; text-align: center;">Failed to load PDF.</p>';
         });
     </script>
 </body>
