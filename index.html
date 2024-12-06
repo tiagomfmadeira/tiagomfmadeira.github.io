@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiago Madeira</title>
+    <title>PDF Viewer</title>
 
     <!-- Include PDF.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -14,37 +14,23 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             background-color: #f5f5f5;
         }
 
         #pdf-viewer {
-            width: 80%;
-            height: 80%;
+            width: 90%; /* Adjust width as needed */
+            height: 90%; /* Adjust height as needed */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             background: white;
             overflow: auto;
-        }
-
-        canvas {
-            display: block;
-            margin: 0 auto;
-        }
-
-        .fallback {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div id="pdf-viewer"></div>
-    <div class="fallback">
-        If the PDF does not load, <a href="https://tiagomfmadeira.github.io/assets/CV_Tiago_Madeira.pdf" target="_blank">click here to download it</a>.
-    </div>
 
     <script>
         // URL to the PDF
@@ -89,7 +75,7 @@
         }).catch((error) => {
             console.error('Error loading PDF:', error);
             const viewer = document.getElementById('pdf-viewer');
-            viewer.innerHTML = '<p style="color: red; text-align: center;">Failed to load PDF. Please try the download link below.</p>';
+            viewer.innerHTML = '<p style="color: red; text-align: center;">Failed to load PDF.</p>';
         });
     </script>
 </body>
