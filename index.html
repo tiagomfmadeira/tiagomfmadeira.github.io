@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="description" content="Tiago Madeira Personal Website">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tiago Madeira</title>
 
-    <!-- Include PDF.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
 
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -20,99 +26,25 @@
             background-color: #f5f5f5;
         }
 
-        #pdf-viewer {
-            position: relative;
+        .pdf-viewer-container {
             width: 95%;
             height: 95%;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            background: white;
-            overflow: auto;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
         }
 
-        .page-container {
-            position: relative;
-            margin-bottom: 10px;
-        }
-
-        canvas {
-            display: block;
-        }
-
-        .text-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none; /* Allow interaction with links */
-        }
-
-        .text-layer a {
-            pointer-events: auto; /* Enable link clicking */
-            color: transparent; /* Keep the overlay invisible */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
 <body>
-    <div id="pdf-viewer"></div>
-
-    <script>
-        const url = 'https://tiagomfmadeira.github.io/assets/CV_Tiago_Madeira.pdf';
-
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-        const pdfViewer = document.getElementById('pdf-viewer');
-
-        // Load the PDF
-        pdfjsLib.getDocument(url).promise.then(pdf => {
-            console.log('PDF loaded');
-
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                pdf.getPage(pageNum).then(page => {
-                    const scale = 1.5;
-                    const viewport = page.getViewport({ scale });
-
-                    // Create a container for the page
-                    const pageContainer = document.createElement('div');
-                    pageContainer.className = 'page-container';
-                    pageContainer.style.width = `${viewport.width}px`;
-                    pageContainer.style.height = `${viewport.height}px`;
-                    pdfViewer.appendChild(pageContainer);
-
-                    // Create the canvas for rendering
-                    const canvas = document.createElement('canvas');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
-                    pageContainer.appendChild(canvas);
-
-                    const canvasContext = canvas.getContext('2d');
-                    const renderContext = {
-                        canvasContext,
-                        viewport,
-                    };
-
-                    page.render(renderContext).promise.then(() => {
-                        console.log(`Page ${pageNum} rendered`);
-                    });
-
-                    // Create the text layer
-                    page.getTextContent().then(textContent => {
-                        const textLayerDiv = document.createElement('div');
-                        textLayerDiv.className = 'text-layer';
-                        pageContainer.appendChild(textLayerDiv);
-
-                        pdfjsLib.renderTextLayer({
-                            textContent,
-                            container: textLayerDiv,
-                            viewport,
-                            textDivs: [],
-                        });
-                    });
-                });
-            }
-        }).catch(error => {
-            console.error('Error loading PDF:', error);
-            pdfViewer.innerHTML = '<p style="color: red; text-align: center;">Failed to load PDF.</p>';
-        });
-    </script>
+    <div class="pdf-viewer-container mdl-shadow--4dp">
+        <iframe src="https://drive.google.com/viewerng/viewer?embedded=true&url=https://tiagomfmadeira.github.io/assets/CV_Tiago_Madeira.pdf"></iframe>
+    </div>
 </body>
 </html>
